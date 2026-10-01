@@ -1,0 +1,13 @@
+{
+  "name": "taskflow-api",
+  "version": "0.1.0",
+  "description": "API de gestion de taches - projet support (module Travail collaboratif & documentation technique)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "license": "UNLICENSED"
+}
