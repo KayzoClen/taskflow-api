@@ -13,10 +13,12 @@
 
 ## Nos critères pour le bon lancement du projet : 
 
-- Titre explicite sur le projet pour le comprendre en 2 secondes
-- Initialisation du projet et installation des dépendances
-- Lisibilité du README en général
+- Un lecteur est capable de me dire ce qu'est le projet à partir du titre uniquement
+- Initialisation du projet /installation des dépendances
 - Préciser ce qui est incomplet / à compléter dans le projet
+- comment lancer le projet
 - Un contact en cas de question / toute demande de la part d'un Dev ou d'un utilisateur
+- Lisibilité du README en général
+
 
 
