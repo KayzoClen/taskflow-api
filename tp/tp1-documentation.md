@@ -12,9 +12,9 @@ Jour 1 : Premier TP
 | src/config.js | Commentaires du code | Dev | Un pair | Dépôt |
 
 ## TP 2 : Critères d’un bon README
-- **Titre :** présenter clairement le but du projet.
+- **Titre :** Nommer le projet en un groupe de mot cohérent à propos de son but.
 - **Description :** résumer les fonctionnalités principales et les technologies utilisées.
-- **Installation :** indiquer les étapes pour installer et lancer le projet.
+- **Installation :** indiquer les étapes pour installer et lancer le projet et indiquer si l'installation est réussie.
 - **Utilisation :** expliquer comment utiliser les fonctionnalités principales.
 - **Architecture :** présenter l’organisation des fichiers principaux.
 - **Tests :** indiquer comment lancer les tests.
