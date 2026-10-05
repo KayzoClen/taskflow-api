@@ -48,7 +48,7 @@ L'API est alors disponible sur `http://localhost:3000`. Le port est fixé en dur
 
 ## Documentation de l'API
 
-Toutes les réponses sont au format JSON (sauf l'erreur 500 décrite plus bas, qui est une page HTML brute — voir les bugs connus).
+Toutes les réponses sont au format JSON, y compris les erreurs.
 
 ### Lister les tâches
 
@@ -116,7 +116,7 @@ Réponse `201 Created` :
 { "id": 4, "title": "Ecrire le README", "done": false, "priority": "high" }
 ```
 
-Si `title` est absent, l'API ne renvoie pas une erreur propre mais plante avec un `500` (bug connu, voir plus bas) :
+Si `title` est absent ou vide, l'API répond `400` avec un message explicite :
 
 ```bash
 curl -i -X POST http://localhost:3000/tasks \
@@ -125,8 +125,8 @@ curl -i -X POST http://localhost:3000/tasks \
 ```
 
 ```
-HTTP/1.1 500 Internal Server Error
-TypeError: Cannot read properties of undefined (reading 'trim')
+HTTP/1.1 400 Bad Request
+{"error":"Le champ 'title' est requis et doit etre une chaine non vide"}
 ```
 
 ### Supprimer une tâche
@@ -135,11 +135,24 @@ TypeError: Cannot read properties of undefined (reading 'trim')
 curl -i -X DELETE http://localhost:3000/tasks/1
 ```
 
-Réponse `204 No Content` (pas de corps dans la réponse).
+Réponse `204 No Content` (pas de corps dans la réponse). Si l'id n'existe pas, l'API répond `404` :
+
+```bash
+curl -i -X DELETE http://localhost:3000/tasks/999
+```
+
+```
+HTTP/1.1 404 Not Found
+{"error":"Tache introuvable"}
+```
 
 ### Export admin (protégé)
 
-Réservé aux porteurs d'une clé d'API admin, à transmettre dans l'en-tête `x-api-key`.
+Réservé aux porteurs d'une clé d'API admin, à transmettre dans l'en-tête `x-api-key`. La clé est définie côté serveur via la variable d'environnement `ADMIN_API_KEY` (aucune valeur par défaut n'est fournie — tant qu'elle n'est pas définie, la route répond systématiquement `403`) :
+
+```bash
+ADMIN_API_KEY=une-cle-secrete npm start
+```
 
 ```bash
 curl -i http://localhost:3000/admin/export
@@ -150,7 +163,11 @@ HTTP/1.1 403 Forbidden
 {"error":"Non autorise"}
 ```
 
-Avec une clé valide, la route renvoie `200` et l'ensemble des tâches :
+Avec la clé valide, la route renvoie `200` et l'ensemble des tâches :
+
+```bash
+curl -i http://localhost:3000/admin/export -H "x-api-key: une-cle-secrete"
+```
 
 ```json
 {
@@ -160,8 +177,6 @@ Avec une clé valide, la route renvoie `200` et l'ensemble des tâches :
   ]
 }
 ```
-
-La clé actuelle est codée en dur dans le dépôt : voir [Limites et bugs connus](#limites-et-bugs-connus) avant tout usage réel.
 
 ## Structure du projet
 
@@ -192,9 +207,7 @@ Le projet en est à ses débuts, toute contribution passe par une issue avant la
 
 ## Limites et bugs connus
 
-- **Comparaison d'id non stricte** (`src/data/taskStore.js`, fonction `getById`) : l'id est comparé avec `==` au lieu de `===`, ce qui masque un problème de cohérence de types dans le reste du code.
-- **Suppression non partageable** (`src/data/taskStore.js`, fonction `remove`) : le tableau `tasks` est réassigné localement. Fonctionne tant que le store reste dans un seul module, mais cassera si le stockage est un jour partagé entre plusieurs instances.
-- **Aucune validation du corps de requête** (`src/routes/tasks.js`, route `POST /tasks`) : si `title` est absent, l'API répond `500` avec une trace brute au lieu d'un `400` explicite (voir exemple dans la [documentation de l'API](#documentation-de-lapi)).
-- **Clé admin codée en dur et versionnée** (`src/config.js`) : la clé `adminApiKey` est en clair dans le dépôt, sans hachage ni rotation possible. À traiter en priorité avant tout déploiement : déplacer la clé dans une variable d'environnement et la révoquer/régénérer puisqu'elle est déjà exposée dans l'historique git.
-- **Stockage non persistant** (`src/data/taskStore.js`) : les données sont en mémoire et réinitialisées à chaque redémarrage du serveur. Choix assumé pour cette V0, à revoir si le besoin de persistance se confirme.
+- **Clé admin déjà exposée dans l'historique git** : la clé codée en dur précédemment commitée dans `src/config.js` doit être considérée comme compromise. Même après son remplacement par la variable d'environnement `ADMIN_API_KEY`, l'ancienne valeur reste lisible dans l'historique du dépôt et doit être traitée comme fuitée (elle n'était d'ailleurs pas une vraie clé de production).
+- **Comparaison en temps non constant** (`src/routes/admin.js`) : la comparaison de clé (`!==`) n'est pas protégée contre les attaques par timing. Acceptable pour ce projet support, à revoir avant un usage en production (ex. `crypto.timingSafeEqual`).
+- **Stockage non persistant** (`src/data/taskStore.js`) : les données sont en mémoire et réinitialisées à chaque redémarrage du serveur. Choix assumé pour cette V0 (voir [ADR 0001](docs/adr/0001-stockage-en-memoire-des-taches.md)), à revoir si le besoin de persistance se confirme.
 - **`dataRetentionDays` non implémenté** (`src/config.js`) : le paramètre existe mais aucune logique de purge des données n'est en place.

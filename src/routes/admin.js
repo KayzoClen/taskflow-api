@@ -8,7 +8,7 @@ const taskStore = require("../data/taskStore");
 // terrain de jeu pour la review securite.
 router.get("/export", (req, res) => {
   const key = req.headers["x-api-key"];
-  if (key !== config.adminApiKey) {
+  if (!config.adminApiKey || key !== config.adminApiKey) {
     return res.status(403).json({ error: "Non autorise" });
   }
   res.json({ exportedAt: new Date().toISOString(), tasks: taskStore.getAll() });
