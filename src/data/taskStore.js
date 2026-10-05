@@ -15,13 +15,9 @@ function getAll() {
   return tasks;
 }
 
-// BUG VOLONTAIRE 1 : comparaison sur des types potentiellement differents.
-// Si l'id arrive en string depuis l'URL (ce qui est toujours le cas avec
-// Express) et que la comparaison etait strictement typee, ca casserait.
-// Ici c'est l'inverse : on utilise == qui masque un vrai probleme de
-// coherence de types dans le reste du code (a faire remonter en review).
 function getById(id) {
-  return tasks.find((t) => t.id == id);
+  const numericId = Number(id);
+  return tasks.find((t) => t.id === numericId);
 }
 
 function create(taskData) {
@@ -35,12 +31,13 @@ function create(taskData) {
   return newTask;
 }
 
-// BUG VOLONTAIRE 2 : la fonction reassigne le tableau local sans jamais
-// le persister ailleurs. Fonctionne "par hasard" ici parce que 'tasks'
-// est dans le meme module, mais casse le pattern attendu si le store
-// est un jour extrait ou partage entre plusieurs instances.
 function remove(id) {
-  tasks = tasks.filter((t) => t.id != id);
+  const numericId = Number(id);
+  const index = tasks.findIndex((t) => t.id === numericId);
+  if (index === -1) {
+    return false;
+  }
+  tasks.splice(index, 1);
   return true;
 }
 
