@@ -7,6 +7,7 @@ API REST de gestion de tâches (Node.js + Express), avec un export réservé à 
 - [Node.js](https://nodejs.org) version `<18 ou supérieure>`
 - npm version `<9 ou supérieure>`
 - Git
+- dotenv
 
 Vérifier ses versions :
 ```bash
