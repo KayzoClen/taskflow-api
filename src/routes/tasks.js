@@ -14,10 +14,12 @@ router.get("/:id", (req, res) => {
   res.json(task);
 });
 
-// BUG VOLONTAIRE 3 : aucune validation du corps de la requete.
-// Si "title" est absent, .trim() plante dans taskStore.create()
-// et renvoie une 500 brute au lieu d'une 400 explicite.
 router.post("/", (req, res) => {
+  const title = req.body && req.body.title;
+  if (typeof title !== "string" || !title.trim()) {
+    return res.status(400).json({ error: "Le titre est obligatoire" });
+  }
+
   const newTask = taskStore.create(req.body);
   res.status(201).json(newTask);
 });
