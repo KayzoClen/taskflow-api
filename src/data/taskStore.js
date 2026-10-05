@@ -3,11 +3,7 @@
 // pas de dependance externe. A rediscuter si le volume de donnees
 // ou le besoin de persistance evolue.
 
-let tasks = [
-  { id: 1, title: "Preparer le support de cours", done: false, priority: "high" },
-  { id: 2, title: "Relire le README", done: false, priority: "medium" },
-  { id: 3, title: "Configurer l'environnement", done: true, priority: "low" },
-];
+import tasks from task_list
 
 let nextId = 4;
 
@@ -21,11 +17,19 @@ function getAll() {
 // Ici c'est l'inverse : on utilise == qui masque un vrai probleme de
 // coherence de types dans le reste du code (a faire remonter en review).
 function getById(id) {
-  return tasks.find((t) => t.id == id);
+  if (id == typeof(Number)) {
+    return tasks.find((t) => t.id == id);
+  } else {
+    throw new console.error("id is not a number");
+  }
 }
 
 function create(taskData) {
-  const newTask = {
+
+  if (taskData.title != typeof(String)){
+    throw new console.error("title should be a STRING");
+  } else {
+    const newTask = {
     id: nextId++,
     title: taskData.title.trim(),
     done: false,
@@ -33,6 +37,7 @@ function create(taskData) {
   };
   tasks.push(newTask);
   return newTask;
+  }
 }
 
 // BUG VOLONTAIRE 2 : la fonction reassigne le tableau local sans jamais
