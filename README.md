@@ -20,3 +20,5 @@
 - Une personne à contacter est indiquée en cas de problème ou de question
 - Le README doit être clair, organisé et compréhensible par un nouveau développeur
 - La documentation doit être maintenue à jour avec l'évolution du projet
+
+test pull request
